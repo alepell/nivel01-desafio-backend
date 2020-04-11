@@ -9,7 +9,7 @@ app.use(express.json());
 app.use(cors());
 
 const repositories = [];
-let likes = 0;
+
 
 app.get("/repositories", (request, response) => {
   // Lista todos os repositorios
@@ -18,6 +18,8 @@ app.get("/repositories", (request, response) => {
 
 app.post("/repositories", (request, response) => {
   const { title, url, techs } = request.body;
+
+  let likes = 0;
 
   const repo = { id: uuid(), title, url, techs, likes };
 
@@ -71,7 +73,7 @@ app.post("/repositories/:id/like", (request, response) => {
     return response.status(400).json({ error: "repository not found" });
   }
 
-  repositories[repoIndex].likes = likes += 1;
+  repositories[repoIndex].likes += 1;
 
   repoLiked = repositories[repoIndex];
 
