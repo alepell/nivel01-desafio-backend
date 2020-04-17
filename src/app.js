@@ -10,7 +10,6 @@ app.use(cors());
 
 const repositories = [];
 
-
 app.get("/repositories", (request, response) => {
   // Lista todos os repositorios
   return response.json(repositories);
@@ -19,13 +18,11 @@ app.get("/repositories", (request, response) => {
 app.post("/repositories", (request, response) => {
   const { title, url, techs } = request.body;
 
-  let likes = 0;
-
-  const repo = { id: uuid(), title, url, techs, likes };
+  const repo = { id: uuid(), title, url, techs, likes: 0 };
 
   repositories.push(repo);
 
-  return response.status(200).json({ "Repository created": repo });
+  return response.status(200).json(repo);
 });
 
 app.put("/repositories/:id", (request, response) => {
@@ -38,17 +35,17 @@ app.put("/repositories/:id", (request, response) => {
     return response.status(400).json({ error: "repository not found" });
   }
 
-  const repository = {
+  const repo = {
     id,
     title,
     url,
     techs,
-    likes,
+    likes: repositories[repoIndex].likes,
   };
 
-  repositories[repoIndex] = repository;
+  repositories[repoIndex] = repo;
 
-  return response.json(repository);
+  return response.json(repo);
 });
 
 app.delete("/repositories/:id", (request, response) => {
@@ -62,7 +59,9 @@ app.delete("/repositories/:id", (request, response) => {
 
   repositories.splice(repoIndex, 1);
 
-  return response.status(201).send();
+  //testeg
+
+  return response.status(204).send();
 });
 
 app.post("/repositories/:id/like", (request, response) => {
@@ -73,11 +72,21 @@ app.post("/repositories/:id/like", (request, response) => {
     return response.status(400).json({ error: "repository not found" });
   }
 
-  repositories[repoIndex].likes += 1;
+  const { title, url, techs, likes } = repositories[repoIndex];
 
-  repoLiked = repositories[repoIndex];
+  let newLike = likes + 1;
 
-  return response.json(repoLiked);
+  const repository = {
+    id,
+    title,
+    url,
+    techs,
+    likes: newLike,
+  };
+
+  repositories.splice(repoIndex, 1, repository);
+
+  return response.json(repository);
 });
 
 module.exports = app;
